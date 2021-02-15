@@ -26,9 +26,10 @@
       set_fact:
         pg_labels:
           traefik.enable: 'true'
-          traefik.backend: '{{pgrole}}'
-          traefik.port: '80'
-          traefik.frontend.rule: 'Host:{{pgrole}}.{{domain.stdout}}{{tldset}}{{cname}}'
+          traefik.docker.network: 'proxy'
+          traefik.http.routers.bitwarden-secure.entrypoints: 'websecure'
+          traefik.http.routers.bitwarden-secure.rule: 'Host(`{{ucname.stdout}}.{{domain.stdout}}`)'
+          traefik.http.services.bitwarden.loadbalancer.server.port: '80'
 
     - name: 'Setting PG Volumes'
       set_fact:
@@ -55,5 +56,6 @@
           - name: plexguide
             aliases:
               - '{{pgrole}}'
+          - name: proxy
         state: started
         labels: '{{pg_labels}}'
